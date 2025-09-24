@@ -27,23 +27,21 @@ class GridWorldNoTargetEnv(gym.Env):
         self.window_size = 512  # The size of the PyGame window
 
         #! Observations are dictionaries with the agent's and the target's location.
-        # Each location is encoded as an element of {0, ..., `size`}^2,
-        # i.e. MultiDiscrete([size, size]).
+        # I have (x, y) numpy array observations
+        # thus, my observation space should be a Box instead of Discrete
         self.observation_space = spaces.Box(0, size - 1, shape=(2,), dtype=int) # no target
 
         # We have 4 actions, corresponding to "right", "up", "left", "down", "right"
         self.action_space = spaces.Discrete(4)
 
         """
-        The following dictionary maps abstract actions from `self.action_space` to 
-        the direction we will walk in if that action is taken.
-        i.e. 0 corresponds to "right", 1 to "up" etc.
+        [row,col] = [y,x]
         """
         self._action_to_direction = {
-            Actions.right.value: np.array([1, 0]),
-            Actions.up.value: np.array([0, 1]),
-            Actions.left.value: np.array([-1, 0]),
-            Actions.down.value: np.array([0, -1]),
+            Actions.right.value: np.array([0,1]),
+            Actions.up.value: np.array([-1,0]),
+            Actions.left.value: np.array([0,-1]),
+            Actions.down.value: np.array([1,0]),
         }
 
         assert render_mode is None or render_mode in self.metadata["render_modes"]
@@ -79,48 +77,42 @@ class GridWorldNoTargetEnv(gym.Env):
             self._render_frame()
 
         return self._agent_location, {}
+    
+    def _get_obs(self):
+        return self._agent_location
+
+    def _get_info(self):
+        return {}
 
     def step(self, action):
         x, y = self._agent_location
+        new_loc = self._agent_location
         reward = 0
 
         # special states
         # In state A any action takes the agent four steps down, with reward +10.
         # In state B any action takes the agent two steps down, with reward +5.
         if (x, y) == (0, 1):  # State A
-            self._agent_location = np.array([4, 1])
+            self._agent_location = np.array((4, 1))
             reward = 10
         elif (x, y) == (0, 3):  # State B
             self._agent_location = np.array([2, 3])
             reward = 5
         else:
             # normal moves
-            if action == 0:      # right
-                new_loc = np.array([x + 1, y])
-            elif action == 1:    # up
-                new_loc = np.array([x, y - 1])
-            elif action == 2:    # left
-                new_loc = np.array([x - 1, y])
-            elif action == 3:    # down
-                new_loc = np.array([x, y + 1])
+            direction = self._action_to_direction[action]
+            new_loc = self._agent_location + direction
 
-        # off the grid check
-        # If the action would take the agent off the grid, the agent stays put and gets reward -1.
-        if (
-            new_loc[0] < 0
-            or new_loc[0] >= self.size
-            or new_loc[1] < 0
-            or new_loc[1] >= self.size
-        ):
-            reward = -1
-            # stay put
-            new_loc = np.array([x, y])
-        else:   
-            self._agent_location = new_loc
+            # off the grid check
+            # If the action would take the agent off the grid, the agent stays put and gets reward -1.
+            clipped_loc = np.clip(new_loc, 0, self.size - 1)
+            if not np.array_equal(clipped_loc, new_loc):
+                reward = -1  # agent tried to move off-grid
+
+            self._agent_location = clipped_loc
 
         self.last_reward = reward
         self.return_so_far += reward
-
 
         # no terminal state
         terminated = False
@@ -128,7 +120,7 @@ class GridWorldNoTargetEnv(gym.Env):
 
         if self.render_mode == "human":
             self._render_frame()
-        return self._agent_location, reward, terminated, truncated, {}
+        return self._get_obs(), reward, terminated, truncated, self._get_info()
 
 
     def render(self):
