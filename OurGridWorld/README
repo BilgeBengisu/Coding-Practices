@@ -1,0 +1,25 @@
+1. Installation to support basic usage of Gymnasium:
+   https://gymnasium.farama.org/v0.29.0/content/basic_usage/
+
+`pip install gymnasium[box2d]` did not work for me on the Mac.
+
+Something is wrong with the box2d setup that comes with gymnasium
+and the pip that comes with python3.13.
+
+I had to (on Mac) uninstall gymnasium, then do the following:
+
+brew install swig
+python -m pip install box2d pygame 
+python -m pip install --upgrade setuptools
+python -m ensurepip --upgrade
+python -m pip install gymnasium
+
+2. Installation to support creating a Gymnasium environment:
+   https://gymnasium.farama.org/tutorials/gymnasium_basics/environment_creation/
+
+Follow instructions to install pipx. On Mac:
+brew install pipx
+pipx ensurepath
+sudo pipx ensurepath --global # optional to allow pipx actions with --global argument
+
+Then: `pipx install copier` and follow the instructions.

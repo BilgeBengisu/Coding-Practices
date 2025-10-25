@@ -45,13 +45,6 @@ def initialize_bandits() -> list[Bandit]:
     ]
 
 
-def simple_crit(Q: np.ndarray, N: np.ndarray, t: int, eps: float) -> int:
-    return (
-        int(np.argmax(Q))
-        if np.random.rand() < 1 - eps
-        else np.random.randint(Q.shape[0])
-    )
-
 """
  Q: estimated values for each bandit arm
  N: number of times each arm has been pulled
@@ -65,6 +58,21 @@ def epsilon_action(Q: np.ndarray, N:np.ndarray, t:int, eps:float) -> int:
         else np.random.randint(Q.shape[0]) # else return a random action (exploration)
     )
     
+"""
+    UCB action function
+    all actions will eventually be selected, but actions with lower value estimates,
+    or that have already been selected frequently, will be selected with decreasing frequency
+    over time.
+    ucb formula, the square-root term is a measure of the uncertainty or variance in the estimate of a’s value
+    The use of the natural logarithm means that the increases get smaller over time, but are unbounded
+    c controls the degree of exploration
+    If Nt(a) = 0, then a is considered to be a maximizing action
+"""
+def ucb_action(Q: np.ndarray, N: np.ndarray, t: int, c:float) -> int:
+    return (
+        int(np.argmax(Q + c * np.sqrt(np.log(t + 1) / N)))
+    )
+
 
 """
  passing a list of Bandit objects
@@ -88,6 +96,14 @@ def bandit_solver(
         N[arm_index] = N[arm_index] + 1
         Q[arm_index] = Q[arm_index] + 1 / N[arm_index] * (reward - Q[arm_index]) # q value update formula: old estimate + (1/n)(reward - old estimate)
 
+    # ucb bandit solver
+    for t in range(num_steps):
+        arm_index = ucb_action(Q, N, t, c=2)
+        reward = bandits[arm_index]()
+        rewards.append(reward)
+        N[arm_index] = N[arm_index] + 1
+        Q[arm_index] = Q[arm_index] + 1 / N[arm_index] * (reward - Q[arm_index]) # q value update formula: old estimate + (1/n)(reward - old estimate)
+
     return np.cumsum(rewards) / np.arange(1, len(rewards) + 1)
     # np.cumsum(rewards) gives the cumulative total reward up to each time step.
     # Dividing by the time steps 1, 2, 3, … gives the average reward over time.
@@ -102,11 +118,16 @@ def main() -> None:
         for eps in epss
     ]
 
+    reward_averages.append(
+        bandit_solver(bandits, lambda q, n, t: ucb_action(q, n, t, c=2))
+    )
+
+    labels = [0, 0.01, 0.1, "c=2"]
     # plotting results and averages
-    colors = ["r-", "b-", "g-"]
+    colors = ["r-", "b-", "g-", "k-"]
     for idx, reward_average in enumerate(reward_averages):
         plt.plot(
-            range(len(reward_average)), reward_average, colors[idx], label=epss[idx]
+            range(len(reward_average)), reward_average, colors[idx], label=labels[idx]
         )
     plt.legend()
     plt.show()
