@@ -60,6 +60,4 @@ n_episodes = 10000
 for episode in range(n_episodes):
     continue
 
-
-
 env.close()
