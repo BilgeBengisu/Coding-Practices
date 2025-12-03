@@ -36,23 +36,49 @@ The action is a ndarray with shape (1,) which can take values {0, 1} indicating 
 Note: The velocity that is reduced or increased by the applied force is not fixed and it depends on the angle the pole is pointing. The center of gravity of the pole varies the amount of energy needed to move the cart underneath it
 
 ## Observation Space
-- Observation | min, max
-- Cart Position | -4.8, 4.8
-- Cart Velocity | -Inf, Inf
-- Pole Angle | ~ -0.418 rad (-24°), ~ 0.418 rad (24°)
-- Pole Angular Velocity | -Inf, Inf
+State Space (Continuous, 4 Dimensions)
 
-The cart x-position (index 0) can be take values between (-4.8, 4.8), but the episode terminates if the cart leaves the (-2.4, 2.4) range.
+Each observation is a real-valued vector: [𝑥, 𝑥˙, 𝜃, 𝜃˙]
 
-The pole angle can be observed between (-.418, .418) radians (or ±24°), but the episode terminates if the pole angle is not in the range (-.2095, .2095) (or ±12°)
+Cart Position (𝑥)
+Horizontal position of the cart on the track.
+
+Cart Velocity (𝑥˙)
+Rate of movement of the cart left or right.
+
+Pole Angle (𝜃)
+Angle of the pole relative to vertical (0 = perfectly upright).
+
+Pole Angular Velocity (𝜃˙)
+Rate at which the pole angle is changing.
+
+## Discretization
+Using uniform bins, clipped velocity bounds, and a moderately large number of bins improves state representation enough for convergence
+Number of bins = bias vs. variance tradeoff.
+
+Few bins → high bias → underfitting
+
+Many bins → high variance → slow learning, sparse Q-table
+
 
 ## Rewards
 Since the goal is to keep the pole upright for as long as possible, by default, a reward of +1 is given for every step taken, including the termination step. The default reward threshold is 500 for v1 (the one we use in this project) and 200 for v0 due to the time limit on the environment.
 
 If sutton_barto_reward=True, then a reward of 0 is awarded for every non-terminating step and -1 for the terminating step. As a result, the reward threshold is 0 for v0 and v1
 
+## Takeaways
+cartpole.py has the final solution with test episodes yielding rewards between 150-250. first_implementation.py yielded no rewards higher than 150 and never consistenly, sometimes going as low as 12 rewards an episode after being trained.
+The difference between cartpole.py and first_implementation.py are:
+* Cartpole.py used np for Q_table whereas first_implementation.py used a dictionary. Benefit: Much faster training → more episodes → better convergence
+* First_implementation.py was a manual attempt to discretizing states and normalizing bins. cartpole.py uses np.digitize(). Benefit: makes bins uniform and accurate, better discretization and correct state representation
+* Better epsilon decay schedule. Epsilon_decay 0.9995 instead of 0.99995
+* Higher number of episodes. 25,000 instead of 10,000
+Overall, cartpole.py takes longer but yields a better trained agent.
+
 
 Resources used:
+https://numpy.org/doc/stable/reference/generated/numpy.digitize.html
 https://gymnasium.farama.org/environments/classic_control/cart_pole/
+https://www.nickjalbert.com/reading/2020/06/15/tabular-q-learning-for-cartpole.html
 https://medium.com/swlh/using-q-learning-for-openais-cartpole-v1-4a216ef237df
 https://www.reinforcementlearningpath.com/step-by-step-tutorial-q-learning-example-with-cartpole/
