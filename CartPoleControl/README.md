@@ -5,6 +5,10 @@ For the pole to stay vertical, the cart must move left or right. The pole that i
 
 **Why Q-Learning**
 The agent doesn’t need to understand the full environment. It needs to be consistent. With each step, its decisions get a little better. Every time the agent takes an action and receives feedback. After this step, it updates its internal memory – the Q-table. It’s like a person who adjusts their habits after each small success or failure.
+I have used tabular Q-Learning which, combined with Cart Pole environment, makes it easier to see how Q-Learning works. However, Tabular Q-Learning requires discretization of the feature space as it can't handle Cart Pole's continuous states.
+
+**Q-Learning Algorithm**
+
 
 **Cart Pole Environment**
 https://gymnasium.farama.org/environments/classic_control/cart_pole/
