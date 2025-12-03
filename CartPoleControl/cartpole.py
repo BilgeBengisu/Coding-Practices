@@ -5,7 +5,7 @@ import time
 from math import inf
 
 # 2) create environment
-env = gym.make('CartPole-v1', render_mode='human')
+env = gym.make('CartPole-v1', render_mode='rgb_array') # rgb_array for training purposes
 print(env.action_space.n)
 
 # 3) declare the parameters needed
@@ -141,3 +141,30 @@ print(f"Total states visited: {len(q_table)}")
 print(f"Final average reward (last 100 episodes): {np.mean(episode_rewards[-100:]):.2f}")
 
 env.close()
+
+# Watch trained agent in human render mode
+env = gym.make("CartPole-v1", render_mode="human")
+obs, info = env.reset()
+
+total_reward = 0
+steps = 0
+
+while True:
+    state = discretize_state(obs)
+    
+    # Greedy policy (no epsilon)
+    if state in q_table:
+        action = np.argmax(q_table[state])
+    else:
+        action = env.action_space.sample()
+    
+    obs, reward, terminated, truncated, info = env.step(action)
+    
+    total_reward += reward
+    steps += 1
+
+    if terminated or truncated:
+        break
+
+env.close()
+print(f"Agent survived for {steps} steps and earned total reward {total_reward}.")
