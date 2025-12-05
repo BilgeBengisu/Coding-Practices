@@ -1,3 +1,6 @@
+### How to run
+python cartpole.py
+
 ### Problem at hand
 CartPole is a small cart that moves in a straight line. A thin pole is attached to the cart. The pole is affected by gravity and falls. Our role is to teach an RL agent to move the cart so that the pole stays straight up.
 
@@ -15,7 +18,7 @@ https://gymnasium.farama.org/environments/classic_control/cart_pole/
 This environment corresponds to the version of the cart-pole problem described by Barto, Sutton, and Anderson in “Neuronlike Adaptive Elements That Can Solve Difficult Learning Control Problem”. A pole is attached by an un-actuated joint to a cart, which moves along a frictionless track. The pendulum is placed upright on the cart and the goal is to balance the pole by applying forces in the left and right direction on the cart.
 
 ### Starting State
-All observations are assigned a uniformly random value in (-0.05, 0.05)
+All observations are assigned a Q value of 0 in the beginning.
 
 ### Episode End
 The episode ends if any one of the following occurs:

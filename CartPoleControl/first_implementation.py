@@ -3,6 +3,8 @@ import numpy as np
 import gymnasium as gym
 import time
 from math import inf
+import matplotlib.pyplot as plt
+
 
 # 2) create environment
 env = gym.make('CartPole-v1', render_mode='rgb_array') # rgb_array for training purposes
@@ -142,6 +144,17 @@ print(f"Final average reward (last 100 episodes): {np.mean(episode_rewards[-100:
 
 env.close()
 
+# --- Visualization of Training Performance ---
+plt.figure(figsize=(12, 5))
+plt.subplot(1, 2, 1)
+plt.plot(episode_rewards, label='Episode Reward', color='orange')
+plt.xlabel('Episode')
+plt.ylabel('Reward')
+plt.title('Episode Rewards Over Time')
+plt.grid(True)
+plt.legend()
+
+plt.show()
 
 # Watch trained agent in human render mode for multiple episodes
 n_human_episodes = 5

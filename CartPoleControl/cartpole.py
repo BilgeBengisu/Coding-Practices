@@ -127,6 +127,17 @@ for episode in range(EPISODES):
 
 print("Training finished!")
 
+# --- Visualization of Training Performance ---
+plt.figure(figsize=(10, 5))
+plt.plot(reward_history, label='Episode Reward')
+plt.xlabel('Episode')
+plt.ylabel('Reward')
+plt.title('Episode Rewards Over Time')
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+plt.show()
+
 
 # --------------------------
 # 7. TEST TRAINED AGENT (WATCH)
