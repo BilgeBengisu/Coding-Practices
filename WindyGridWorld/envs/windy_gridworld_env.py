@@ -1,11 +1,5 @@
 import gymnasium as gym
 from gymnasium import spaces # http://deepwiki.com/openai/gym/2.3-spaces
-from gymnasium.envs.registration import register #https://gymnasium.farama.org/api/registry/
-
-register(id='WindyGridWorld-v0',
-         entry_point='windy_gridworld_env:WindyGridWorldEnv',
-        )
-
 # implementing the Windy Gridworld environment
 class WindyGridWorldEnv(gym.Env):
     def __init__(self):

@@ -14,7 +14,7 @@ def run_e_sarsa(env, Q, num_episodes=170, alpha=0.5, gamma=1.0, epsilon=0.1):
 
     time_steps = np.zeros(num_episodes)  # to keep track of time steps per episode
     t = 0 # accumulates over episodes
-    ## run e-greedy sarsa algorithm
+    ## run e-greedy sarsa algorithm from the book
     for n in range(num_episodes):
         state, _ = env.reset() # returns observation and info (info is an empty dict, drop it)
         action = epsilon_greedy_policy(Q, state, epsilon, env.action_space.n)
