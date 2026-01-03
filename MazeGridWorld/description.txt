@@ -1,0 +1,7 @@
+Implementing Tabular Dyna-Q to solve the Maze GridWorld
+
+MazeGridWorld.py defines the maze gridworld env, step, and reset fucntions. 
+These are then used in run_maze_gridworld.py to pass the environment for the homework -> OurMaze
+
+run_maze_gridworld.py has helper functions, e-greedy policy function, and dyna-q algorithm function. 
+at the very bottom, the algorithm is run and the results are plotted/printed.
